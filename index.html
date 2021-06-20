@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="index.css">
+    <title>Amicorum Stats</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0-rc/dist/chartjs-plugin-datalabels.min.js"></script>
+    <script src="data/week1.js"></script>
+    <script src="data/week2.js"></script>
+    <script src="data/week3.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Amicorum Stats</h1>
+    </header>
+    <nav>
+        <div class="weekLinksBar">
+            <button class="weekLinks" id="allButton">All</button>
+            <button class="weekLinks" id="week1Button">Week 1</button>
+            <button class="weekLinks" id="week2Button">Week 2</button>
+            <button class="weekLinks" id="week3Button">Week 3</button>
+            <button class="weekLinks" disabled>The future...</button>
+        </div>
+    </nav>
+    <section id="graphSection">
+        <h2 id="graphSectionTitle">Title</h2>
+        <div id="allGraphsContainer">
+            <div class="graphContainer">
+                <h2 id="totalRollsTitle" class="graphTitle">Total Rolls</h2> 
+                <div class="graph">
+                    <canvas id="totalRollsChart"></canvas>
+                </div>
+            </div>
+            <div class="graphContainer">
+                <h2 id="natural20sTitle" class="graphTitle">Natural 20's</h2>
+                <div class="graph">
+                    <canvas id="nat20sChart"></canvas>
+                </div>
+            </div>
+            <div class="graphContainer">
+                <h2 id="natural1sTitle" class="graphTitle">Natural 1's</h2>
+                <div class="graph">
+                    <canvas id="nat1sChart"></canvas>
+                </div>
+            </div>
+            <div class="graphContainer">
+                <h2 id="avgRollTitle" class="graphTitle">Average Roll Result (d20)</h2>
+                <div class="graph">
+                    <canvas id="avgRollChart"></canvas>
+                </div>
+            </div>
+            <div class="graphContainer">
+                <h2 id="dmgDoneTitle" class="graphTitle">Damage Done</h2>
+                <div class="graph">
+                    <canvas id="dmgDoneChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </section>
+    <p id="disclaimer">stats are not 100% accurate</p>
+    <script src="index.js"></script>
+</body>
+</html>
