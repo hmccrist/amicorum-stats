@@ -123,6 +123,7 @@ class PlayerData {
         this.playerData['nat1s'] += newPlayerData['nat1s'];
         this.playerData['allD20Rolls'] = this.playerData['allD20Rolls'].concat(newPlayerData['allD20Rolls']);
         this.playerData['dmgDoneTotal'] += newPlayerData['dmgDoneTotal'];
+        this.playerData['attackRolls'] += newPlayerData['attackRolls'];
         this.calculateAvg();
     }
 }
@@ -198,6 +199,12 @@ class RollData {
             this.data[name].playerData['dmgDoneTotal'] += parseInt(roll['rollShort']);
         }
 
+        // Check if the roll is an Attack roll
+        matchResult = roll['title'].match('TO HIT');
+        if (matchResult) {
+            //console.log(`${roll['sender']}: ${roll['title']}: ${roll['rollShort']}`);
+            this.data[name].playerData['attackRolls'] += 1;
+        }
         //todo
     }
 
@@ -228,7 +235,8 @@ class RollData {
             'totalRolls',
             'nat20s',
             'nat1s',
-            'dmgDoneTotal'
+            'dmgDoneTotal',
+            'attackRolls'
         ]
         if (!validDataEntrys.includes(dataEntry)) { console.error(`Not a valid data entry: ${dataEntry}`); return -1; }
         let total = 0;
@@ -294,7 +302,8 @@ const allGraphs = {
     nat20sGraph: new RollGraph(document.getElementById("nat20sChart"), initialRollData, 'nat20s', 'Natural 20\'s'),
     nat1sGraph: new RollGraph(document.getElementById("nat1sChart"), initialRollData, 'nat1s', 'Natural 1\'s'),
     avgRollGraph: new RollGraph(document.getElementById("avgRollChart"), initialRollData, 'avgRoll', 'Average Roll'),
-    dmgDoneGraph: new RollGraph(document.getElementById("dmgDoneChart"), initialRollData, 'dmgDoneTotal', 'Damage Done')
+    dmgDoneGraph: new RollGraph(document.getElementById("dmgDoneChart"), initialRollData, 'dmgDoneTotal', 'Damage Done'),
+    attacksRolledGraph: new RollGraph(document.getElementById("attacksRolledChart"), initialRollData, 'attackRolls', 'Attacks')
 }
 
 // Update some graph titles for the relevant week
@@ -302,12 +311,14 @@ const totalRollsTitle = document.getElementById("totalRollsTitle");
 const natural20sTitle = document.getElementById("natural20sTitle");
 const natural1sTitle = document.getElementById("natural1sTitle");
 const dmgDoneTitle = document.getElementById("dmgDoneTitle");
+const attacksRolledTitle = document.getElementById("attacksRolledTitle");
 
 function updateGraphTitles(weekRollData) {
     totalRollsTitle.innerText = `Total Rolls (${weekRollData.getCombinedRolls('totalRolls')})`;
     natural20sTitle.innerText = `Natural 20's (${weekRollData.getCombinedRolls('nat20s')})`;
     natural1sTitle.innerText = `Natural 1's (${weekRollData.getCombinedRolls('nat1s')})`;
     dmgDoneTitle.innerText = `Damage Done (${weekRollData.getCombinedRolls('dmgDoneTotal')} HP)`;
+    attacksRolledTitle.innerText = `Attacks Rolled (${weekRollData.getCombinedRolls('attackRolls')})`;
 }
 
 
@@ -332,14 +343,3 @@ function pageSetup(pageData) {
 }
 
 pageSetup(pageData);
-
-
-// stuff
-// console.log(`Week 1 rolls: ${week1Data.length}`);
-// console.log(`Week 2 rolls: ${week2Data.length}`);
-console.log(`Week 3 rolls: ${week3Data.length}`);
-// console.log(`All rolls: ${week1Data.length + week2Data.length + week3Data.length}`);
-
-console.log(week1RollData.getCombinedRolls('nat1s'));
-
-console.log(`All damage rolls: ${testGlobal}`)
