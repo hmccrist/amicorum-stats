@@ -63,15 +63,6 @@ const week4Data = [
     "title": "CUSTOM: ROLL"
   },
   {
-    "rollLong": "2 + 1 + 200",
-    "rollShort": "203",
-    "rollType": "2d6+200",
-    "rollVantage": "none",
-    "sender": "Dracone",
-    "time": "6/27/2021 6:08 PM",
-    "title": "TALONFALL: DAMAGE"
-  },
-  {
     "rollLong": "3",
     "rollShort": "3",
     "rollType": "1d20",
