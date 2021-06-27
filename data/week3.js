@@ -459,6 +459,15 @@ const week3Data = [
     "title": "GUIDING BOLT: DAMAGE"
   },
   {
+    "rollLong": "6 + 3 + 5 + 1",
+    "rollShort": "15",
+    "rollType": "4d6",
+    "rollVantage": "none",
+    "sender": "Explosion",
+    "time": "6/19/2021 7:24 PM",
+    "title": "GUIDING BOLT: DAMAGE"
+  },
+  {
     "rollLong": "20 + 6",
     "rollShort": "26",
     "rollType": "1d20+6",

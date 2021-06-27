@@ -262,11 +262,13 @@ Chart.register(ChartDataLabels);    // plugin to display numbers on the charts
 const week1RollData = new RollData(week1Data);
 const week2RollData = new RollData(week2Data);
 const week3RollData = new RollData(week3Data);
+const week4RollData = new RollData(week4Data);
 
 // easiest way to do this (probably not the best...)
 const allRollData = new RollData(week1Data);
 allRollData.combineRollData(week2RollData);
 allRollData.combineRollData(week3RollData);
+allRollData.combineRollData(week4RollData);
 
 const pageData = {
     all: {
@@ -288,6 +290,11 @@ const pageData = {
         title: 'Week 3 - Snowy the Chwinga',
         button: document.getElementById('week3Button'),
         data: week3RollData
+    },
+    week4: {
+        title: 'Week 4 - The Company of the Giant Elks',
+        button: document.getElementById('week4Button'),
+        data: week4RollData
     }
 }
 
