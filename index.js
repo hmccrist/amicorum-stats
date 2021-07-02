@@ -16,8 +16,6 @@ const draconeFullName = 'Dracone';
 const glaceFullName = 'Glace';
 const ruuskFullName = 'Ruusk';
 
-let testGlobal = 0;
-
 // elem: chart on html
 // RollData: relevant data (of the week)
 // rollDataName: the data the graph will use... e.g. 'nat20s' or 'avgRoll' etc.
@@ -101,7 +99,9 @@ class PlayerData {
             'avgRoll': 0,
             'attackRolls': 0,
             'dmgRolls': 0,
-            'dmgDoneTotal': 0
+            'dmgDoneTotal': 0,
+            'attackRollsDict': {},          // key = title | value(s) = rollShort
+            'dmgRollsDict': {}
         };
     }
 
@@ -117,6 +117,24 @@ class PlayerData {
         }
     }
 
+    addAttackRoll(rollTitle, rollResult) {
+        if (!(rollTitle in this.playerData.attackRollsDict)) {
+            this.playerData.attackRollsDict[rollTitle] = [rollResult];
+        }
+        else {
+            this.playerData.attackRollsDict[rollTitle].push(rollResult);
+        }
+    }
+
+    addDmgRoll(rollTitle, rollResult) {
+        if (!(rollTitle in this.playerData.dmgRollsDict)) {
+            this.playerData.dmgRollsDict[rollTitle] = [rollResult];
+        }
+        else {
+            this.playerData.dmgRollsDict[rollTitle].push(rollResult);
+        }
+    }
+
     combineData(newPlayerData) {
         this.playerData['totalRolls'] += newPlayerData['totalRolls'];
         this.playerData['nat20s'] += newPlayerData['nat20s'];
@@ -124,6 +142,22 @@ class PlayerData {
         this.playerData['allD20Rolls'] = this.playerData['allD20Rolls'].concat(newPlayerData['allD20Rolls']);
         this.playerData['dmgDoneTotal'] += newPlayerData['dmgDoneTotal'];
         this.playerData['attackRolls'] += newPlayerData['attackRolls'];
+        // attackRollsDict
+        for (let key in newPlayerData['attackRollsDict']) {
+            for (let i in newPlayerData['attackRollsDict'][key]) {
+                const rollResult = newPlayerData['attackRollsDict'][key][i];
+                const rollTitle = key;
+                this.addAttackRoll(rollTitle, rollResult);
+            }
+        }
+        // dmgRollsDict
+        for (let key in newPlayerData['dmgRollsDict']) {
+            for (let i in newPlayerData['dmgRollsDict'][key]) {
+                const rollResult = newPlayerData['dmgRollsDict'][key][i];
+                const rollTitle = key;
+                this.addDmgRoll(rollTitle, rollResult);
+            }
+        }
         this.calculateAvg();
     }
 }
@@ -131,11 +165,11 @@ class PlayerData {
 class RollData {
     constructor(rawData) {
         this.data = {
-            'Casmenos': new PlayerData('Casmenos', casmenosColour),
-            'Alwin': new PlayerData('Alwin', alwinColour),
-            'Explosion': new PlayerData('Explosion', explosionColour),
-            'Dracone': new PlayerData('Dracone', draconeColour),
-            'Ruusk': new PlayerData('Ruusk', ruuskColour),
+            'Casmenos': new PlayerData(casmenosFullName, casmenosColour),
+            'Alwin': new PlayerData(alwinFullName, alwinColour),
+            'Explosion': new PlayerData(explosionFullName, explosionColour),
+            'Dracone': new PlayerData(draconeFullName, draconeColour),
+            'Ruusk': new PlayerData(ruuskFullName, ruuskColour),
             'NPCs': new PlayerData('NPCs', npcColour)
         }
         this.buildData(rawData);
@@ -197,14 +231,21 @@ class RollData {
         if (matchResult) {
             //console.log(`${roll['sender']}: ${roll['title']}: ${roll['rollShort']}`);
             this.data[name].playerData['dmgDoneTotal'] += parseInt(roll['rollShort']);
+            this.data[name].addDmgRoll(roll['title'], parseInt(roll['rollShort']));
         }
-
+        
         // Check if the roll is an Attack roll
         matchResult = roll['title'].match('TO HIT');
         if (matchResult) {
             //console.log(`${roll['sender']}: ${roll['title']}: ${roll['rollShort']}`);
             this.data[name].playerData['attackRolls'] += 1;
+            this.data[name].addAttackRoll(roll['title'], parseInt(roll['rollShort']));      // todo: if natroll is 1 then just add 1. (no modifiers)
         }
+        
+        
+        
+
+        
         //todo
     }
 
@@ -273,26 +314,31 @@ allRollData.combineRollData(week4RollData);
 const pageData = {
     all: {
         title: 'All Rolls!',
+        charPageTitle: 'The Entire Campaign',
         button: document.getElementById('allButton'),
         data: allRollData
     },
     week1: {
         title: 'Week 1 - Murderer Made of Ice',
+        charPageTitle: 'Week 1',
         button: document.getElementById('week1Button'),
         data: week1RollData
     },
     week2: {
         title: 'Week 2 - A Bag of Animals',
+        charPageTitle: 'Week 2',
         button: document.getElementById('week2Button'),
         data: week2RollData
     },
     week3: {
         title: 'Week 3 - Snowy the Chwinga',
+        charPageTitle: 'Week 3',
         button: document.getElementById('week3Button'),
         data: week3RollData
     },
     week4: {
         title: 'Week 4 - The Company of the Giant Elks',
+        charPageTitle: 'Week 4',
         button: document.getElementById('week4Button'),
         data: week4RollData
     }
@@ -345,8 +391,179 @@ function pageSetup(pageData) {
             }
             graphSectionTitle.innerText = weekData['title'];
             updateGraphTitles(weekData['data']);
+            charPage.setRollData(weekData['data'], weekData['charPageTitle']);
         });
     }
 }
-
 pageSetup(pageData);
+
+// global funcs for hiding/showing the pages
+const graphSection = document.getElementById("graphSection");
+const charPageSection = document.getElementById("charPageSection");
+function showGraphPage() {
+    charPageSection.hidden = true;
+    graphSection.hidden = false;
+}
+function showCharPage() {
+    charPageSection.hidden = false;
+    graphSection.hidden = true;
+}
+
+
+/* Character Page */
+class CharPage {
+    constructor(initialData, initialWeekName) {
+        this.activeChar = null;
+        this.rollData = initialData;
+        this.weekName = initialWeekName;
+        this.titleElem = document.getElementById("charPageTitle");
+        this.charAttackedBox = document.getElementById("charAttackedBox");
+        this.charDamageBox = document.getElementById("charDamageBox");
+    }
+
+    updatePage() {
+        if (this.activeChar === null) { return false; }
+        const pData = this.rollData.data[this.activeChar];
+        this.titleElem.innerText = `${pData.name} - ${this.weekName}`;
+        // Attacked Box
+        this.charAttackedBox.innerHTML = '';    // clear the box before adding new elements
+        // title
+        const attackedTitle = document.createElement("h3");
+        attackedTitle.innerText = `${this.activeChar} Attacked ${pData.playerData.attackRolls} Times`;
+        this.charAttackedBox.appendChild(attackedTitle);
+        // weapon specifics
+        const allWeaponAttacks = pData.playerData.attackRollsDict;
+        for (let key in allWeaponAttacks) {
+            const attackType = this.extractTitle(key);
+            const allAttackResults = allWeaponAttacks[key];
+            const bestHit = Math.max(...allAttackResults);
+            const worstHit = Math.min(...allAttackResults);
+            const avgHit = Math.round(allAttackResults.reduce((a, b) => a + b, 0) / allAttackResults.length);
+            // new attack title
+            const newAtkTitle = document.createElement("h4");
+            newAtkTitle.innerText = `${allAttackResults.length}x ${attackType}`;
+            this.charAttackedBox.appendChild(newAtkTitle);
+            // all rolls
+            const allRolls = document.createElement("p");
+            allRolls.className = "allRolls";
+            allRolls.innerText = `(${allAttackResults})`;
+            this.charAttackedBox.appendChild(allRolls);
+            // new attack quick stats
+            const atkStats = document.createElement("p");
+            atkStats.className = "quickStats";
+            atkStats.innerText = `Best Hit: ${bestHit} | Worst Hit: ${worstHit} | Average Hit: ${avgHit}`;
+            this.charAttackedBox.appendChild(atkStats);
+        }
+
+        // Damage Box   - mostly the same as Attacked Box
+        this.charDamageBox.innerHTML = '';
+        // title
+        const damageTitle = document.createElement("h3");
+        damageTitle.innerText = `${this.activeChar} Dealt ${pData.playerData.dmgDoneTotal} Damage`;
+        this.charDamageBox.appendChild(damageTitle);
+        // damage specifics
+        const allDamageDone = pData.playerData.dmgRollsDict;
+        for (let key in allDamageDone) {
+            const dmgType = this.extractTitle(key);
+            const allDmgResults = allDamageDone[key];
+            const bestDmg = Math.max(...allDmgResults);
+            const worstDmg = Math.min(...allDmgResults)
+            const allDmg = allDmgResults.reduce((a, b) => a + b, 0);
+            const avgDmg = Math.round(allDmgResults.reduce((a, b) => a + b, 0) / allDmgResults.length);
+            // new dmg title
+            const newDmgTitle = document.createElement("h4");
+            newDmgTitle.innerText = `${allDmg} from ${dmgType}`;
+            this.charDamageBox.appendChild(newDmgTitle);
+            // all rolls
+            const allDmgRolls = document.createElement("p");
+            allDmgRolls.className = "allRolls";
+            allDmgRolls.innerText = `(${allDmgResults})`;
+            this.charDamageBox.appendChild(allDmgRolls);
+            // new dmg quick stats
+            const dmgStats = document.createElement("p");
+            dmgStats.className = "quickStats";
+            dmgStats.innerText = `Best Damage: ${bestDmg} | Worst Damage: ${worstDmg} | Average Damage: ${avgDmg}`;
+            this.charDamageBox.appendChild(dmgStats);
+        }
+
+    }
+
+    // extract the title of an attack/damage roll
+    // e.g. CROSSBOW, LIGHT: TO HIT => crossbow, light
+    extractTitle(s) {
+        const colonIndex = s.search(':');
+        const newString = s.slice(0, colonIndex).toLowerCase();
+        return newString;
+    }
+
+    setActiveChar(charName) {
+        const validCharNames = ['Alwin', 'Casmenos', 'Dracone', 'Explosion', 'NPCs', 'Ruusk'];
+        if (!validCharNames.includes(charName)) { console.error(`Invalid charName: '${charName}' @ setActiveChar`); return false;}
+        this.activeChar = charName;
+        this.updatePage();
+    }
+
+    setNoActiveChar() {
+        this.activeChar = null;
+        this.updatePage();
+    }
+
+    setRollData(rollData, weekName) {
+        this.rollData = rollData;
+        this.weekName = weekName;
+        this.updatePage();
+    }
+}
+const charPage = new CharPage(allRollData, 'The Entire Campaign');
+
+/* Char Buttons */
+class charButton {
+    constructor(HTMLElem, charName) {
+        this.active = false;
+        this.HTMLElem = HTMLElem;
+        HTMLElem.addEventListener("click", () => {
+            const a = this.active;
+            makeAllCharButtonsInactive()
+            if (a) {
+                this.active = false;
+                charPage.setNoActiveChar();
+            }
+            else {
+                this.active = true;
+                charPage.setActiveChar(charName);
+            }
+            this.updateButton();
+        });
+    }
+
+    updateButton() {
+        if (this.active) {
+            showCharPage();
+            this.HTMLElem.className = 'activeCharButton';
+        }
+        else {
+            showGraphPage();
+            this.HTMLElem.className = 'charLinks';
+        }
+    }
+
+    setActive(b) {
+        this.active = b;
+        this.updateButton();
+    }
+}
+
+const casmenosButton = new charButton(document.getElementById("casmenosButton"), "Casmenos");
+const alwinButton = new charButton(document.getElementById("alwinButton"), 'Alwin');
+const explosionButton = new charButton(document.getElementById("explosionButton"), "Explosion");
+const draconeButton = new charButton(document.getElementById("draconeButton"), 'Dracone');
+const ruuskButton = new charButton(document.getElementById("ruuskButton"), 'Ruusk');
+
+// global func to make all buttons inactive
+function makeAllCharButtonsInactive() {
+    casmenosButton.setActive(false);
+    alwinButton.setActive(false);
+    explosionButton.setActive(false);
+    draconeButton.setActive(false);
+    ruuskButton.setActive(false);
+}

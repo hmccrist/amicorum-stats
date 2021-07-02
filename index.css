@@ -5,8 +5,33 @@ body {
     font-family: "Roboto Condensed",Roboto,Helvetica,sans-serif;
 }
 
-h1, h2 {
+h1 {
     color: rgba(255, 255, 255, 0.8);
+}
+
+h2 {
+    color: rgba(255, 255, 255, 0.8);
+    text-shadow: 0 0 7px #053c49;
+}
+
+h3 {
+    /*text-shadow: 1px 1px rgb(45, 59, 59); */
+    color: #a5effa;
+    text-shadow: 0 0 5px #000000;
+    font-size: larger;
+}
+
+h4 {
+    text-transform: capitalize;
+    line-height: 0%;
+    font-size: large;
+    color: rgb(149, 231, 243);
+    text-shadow: 0 0 5px #000000;
+}
+
+.navBar {
+    display: flex;
+    flex-direction: row;
 }
 
 .weekLinksBar {
@@ -31,6 +56,33 @@ h1, h2 {
 .weekLinks:last-child {
     border: 1px solid rgba(211, 211, 211, 0.2);
     background-color: rgba(224, 255, 255, 0.2);
+}
+
+.charLinksBar {
+    display: flex;
+    flex-direction: row;
+    gap: 0px;
+    align-self: flex-end;
+    margin-left: auto;
+}
+
+.charLinks {
+    font-size: larger;
+    padding: 10px 15px;
+    border: 1px solid rgba(173, 173, 173, 0.5);
+    transition: all 0.2s ease-in-out;
+    color: white;
+}
+
+.activeCharButton {
+    font-size: larger;
+    padding: 10px 15px;
+    border: 1px solid rgba(173, 173, 173, 0.5);
+    transition: all 0.2s ease-in-out;
+    color: white;
+    outline: none;
+    border-color: #9ecaed;
+    box-shadow: 0 0 10px #9ecaed;
 }
 
 .graphContainer {
@@ -63,4 +115,83 @@ h1, h2 {
     color: rgba(255, 255, 255, 0.8);
     font-size: small;
     font-style: italic;
+}
+
+
+
+/* Character Stats Page */
+
+#charPageBoxesContainer {
+    display: flex;
+    gap: 20px;
+}
+
+.charPageBox {
+    background-color: rgba(0, 0, 0, 0.2);
+    padding-left: 10px;
+    padding-top: 1px;
+    width: 500px;
+    outline: none;
+    box-shadow: 0 0 10px #00293b;
+}
+
+.allRolls {
+    font-size: small;
+    font-style: italic;
+    line-height: 0%;
+    color: rgb(15, 15, 15);
+}
+
+.quickStats {
+    font-size: large;
+}
+
+
+/* Char Buttons */
+#casmenosButton {
+    background-color: rgba(143, 0, 0, 0.5);
+}
+
+#casmenosButton:hover {
+    background-color: rgba(107, 0, 0, 0.5);
+}
+
+#alwinButton {
+    background-color: rgba(21, 57, 158, 0.5);
+}
+
+#alwinButton:hover {
+    background-color: rgba(15, 42, 116, 0.5);
+}
+
+#explosionButton {
+    background-color: rgba(255, 98, 0, 0.5);
+}
+
+#explosionButton:hover {
+    background-color: rgba(202, 79, 2, 0.5);
+}
+
+#draconeButton {
+    background-color: rgba(40, 40, 40, 0.5);
+}
+
+#draconeButton:hover {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+#ruuskButton {
+    background-color: rgba(137, 85, 189, 0.5);
+}
+
+#ruuskButton:hover {
+    background-color: rgba(115, 71, 158, 0.5);
+}
+
+#glaceButton {
+    background-color: rgba(17, 145, 15, 0.5);
+}
+
+#glaceButton:hover {
+    background-color: rgba(15, 122, 13, 0.5);
 }

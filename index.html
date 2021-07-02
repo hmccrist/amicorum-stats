@@ -17,7 +17,7 @@
     <header>
         <h1>Amicorum Stats</h1>
     </header>
-    <nav>
+    <nav class="navBar">
         <div class="weekLinksBar">
             <button class="weekLinks" id="allButton">All</button>
             <button class="weekLinks" id="week1Button">Week 1</button>
@@ -25,6 +25,14 @@
             <button class="weekLinks" id="week3Button">Week 3</button>
             <button class="weekLinks" id="week4Button">Week 4</button>
             <button class="weekLinks" disabled>The future...</button>
+        </div>
+        <div class="charLinksBar">
+            <button class="charLinks" id="casmenosButton">Casmenos</button>
+            <button class="charLinks" id="alwinButton">Alwin</button>
+            <button class="charLinks" id="explosionButton">Explosion</button>
+            <button class="charLinks" id="draconeButton">Dracone</button>
+            <button class="charLinks" id="ruuskButton">Ruusk</button>
+            <button class="charLinks" id="glaceButton">Glace</button>
         </div>
     </nav>
     <section id="graphSection">
@@ -65,6 +73,21 @@
                 <div class="graph">
                     <canvas id="dmgDoneChart"></canvas>
                 </div>
+            </div>
+        </div>
+    </section>
+    <section id="charPageSection" hidden>
+        <h2 id="charPageTitle">Character Name - Week ?</h2>
+        <div id="charPageBoxesContainer">
+            <div class="charPageBox" id="charAttackedBox">
+                <h3 id="charAttackedTitle">Attacked ?? Times</h3>
+                <h4>??x Placeholder Weapon</h4>
+                <p>Best Hit: ?? | Worst Hit: ?? | Average Hit: ??</p>
+            </div>
+            <div class="charPageBox" id="charDamageBox">
+                <h3 id="charDamageTitle">Dealt ?? Damage</h3>
+                <h4>?? from Placeholder Weapon</h4>
+                <p>Best Damage: ?? | Worst Damage: ?? | Average DMG: ??</p>
             </div>
         </div>
     </section>
