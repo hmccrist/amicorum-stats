@@ -90,7 +90,7 @@ class RollGraph {
 class PlayerData {
     constructor(name, colour) {
         this.name = name;
-        this.playerData = {
+        this.playerData = {                 // if adding any new values, remeber to update combineData() also
             'colour': colour,
             'totalRolls': 0,
             'nat20s': 0,
@@ -100,8 +100,12 @@ class PlayerData {
             'attackRolls': 0,
             'dmgRolls': 0,
             'dmgDoneTotal': 0,
+            'abilityRolls': 0,
+            'saveRolls': 0,
             'attackRollsDict': {},          // key = title | value(s) = rollShort
-            'dmgRollsDict': {}
+            'dmgRollsDict': {},
+            'abilityRollsDict': {},
+            'saveRollsDict': {}
         };
     }
 
@@ -117,21 +121,24 @@ class PlayerData {
         }
     }
 
-    addAttackRoll(rollTitle, rollResult) {
-        if (!(rollTitle in this.playerData.attackRollsDict)) {
-            this.playerData.attackRollsDict[rollTitle] = [rollResult];
+    // make sure dictName is correct (attackRollsDict, dmgRollsDict etc.)
+    addRollToDict(dictName, rollTitle, rollResult) {
+        if (!(rollTitle in this.playerData[dictName])) {
+            this.playerData[dictName][rollTitle] = [rollResult];
         }
         else {
-            this.playerData.attackRollsDict[rollTitle].push(rollResult);
+            this.playerData[dictName][rollTitle].push(rollResult);
         }
     }
 
-    addDmgRoll(rollTitle, rollResult) {
-        if (!(rollTitle in this.playerData.dmgRollsDict)) {
-            this.playerData.dmgRollsDict[rollTitle] = [rollResult];
-        }
-        else {
-            this.playerData.dmgRollsDict[rollTitle].push(rollResult);
+    // i wrote this func and im confused
+    combineDicts(dictName, d) {
+        for (let key in d) {
+            for (let i in d[key]) {
+                const rollResult = d[key][i];
+                const rollTitle = key;
+                this.addRollToDict(dictName, rollTitle, rollResult);
+            }
         }
     }
 
@@ -142,22 +149,12 @@ class PlayerData {
         this.playerData['allD20Rolls'] = this.playerData['allD20Rolls'].concat(newPlayerData['allD20Rolls']);
         this.playerData['dmgDoneTotal'] += newPlayerData['dmgDoneTotal'];
         this.playerData['attackRolls'] += newPlayerData['attackRolls'];
-        // attackRollsDict
-        for (let key in newPlayerData['attackRollsDict']) {
-            for (let i in newPlayerData['attackRollsDict'][key]) {
-                const rollResult = newPlayerData['attackRollsDict'][key][i];
-                const rollTitle = key;
-                this.addAttackRoll(rollTitle, rollResult);
-            }
-        }
-        // dmgRollsDict
-        for (let key in newPlayerData['dmgRollsDict']) {
-            for (let i in newPlayerData['dmgRollsDict'][key]) {
-                const rollResult = newPlayerData['dmgRollsDict'][key][i];
-                const rollTitle = key;
-                this.addDmgRoll(rollTitle, rollResult);
-            }
-        }
+        this.playerData['abilityRolls'] += newPlayerData['abilityRolls'];
+        this.playerData['saveRolls'] += newPlayerData['saveRolls'];
+        this.combineDicts('attackRollsDict', newPlayerData['attackRollsDict']);
+        this.combineDicts('dmgRollsDict', newPlayerData['dmgRollsDict']);
+        this.combineDicts('abilityRollsDict', newPlayerData['abilityRollsDict']);
+        this.combineDicts('saveRollsDict', newPlayerData['saveRollsDict']);
         this.calculateAvg();
     }
 }
@@ -231,7 +228,7 @@ class RollData {
         if (matchResult) {
             //console.log(`${roll['sender']}: ${roll['title']}: ${roll['rollShort']}`);
             this.data[name].playerData['dmgDoneTotal'] += parseInt(roll['rollShort']);
-            this.data[name].addDmgRoll(roll['title'], parseInt(roll['rollShort']));
+            this.data[name].addRollToDict('dmgRollsDict', roll['title'], parseInt(roll['rollShort']));
         }
         
         // Check if the roll is an Attack roll
@@ -239,7 +236,21 @@ class RollData {
         if (matchResult) {
             //console.log(`${roll['sender']}: ${roll['title']}: ${roll['rollShort']}`);
             this.data[name].playerData['attackRolls'] += 1;
-            this.data[name].addAttackRoll(roll['title'], parseInt(roll['rollShort']));      // todo: if natroll is 1 then just add 1. (no modifiers)
+            this.data[name].addRollToDict('attackRollsDict', roll['title'], parseInt(roll['rollShort'])); // todo: if natroll is 1 then just add 1. (no modifiers)
+        }
+
+        // Ability rolls
+        matchResult = roll['title'].match('CHECK');
+        if (matchResult) {
+            this.data[name].playerData['abilityRolls'] += 1;
+            this.data[name].addRollToDict('abilityRollsDict', roll['title'], parseInt(roll['rollShort']));
+        }
+
+        // Saves
+        matchResult = roll['title'].match('SAVE');
+        if (matchResult) {
+            this.data[name].playerData['saveRolls'] += 1;
+            this.data[name].addRollToDict('saveRollsDict', roll['title'], parseInt(roll['rollShort']));
         }
         
         
@@ -419,12 +430,15 @@ class CharPage {
         this.titleElem = document.getElementById("charPageTitle");
         this.charAttackedBox = document.getElementById("charAttackedBox");
         this.charDamageBox = document.getElementById("charDamageBox");
+        this.charAbilityBox = document.getElementById("charAbilityBox");
+        this.charSaveBox = document.getElementById("charSaveBox");
     }
 
     updatePage() {
         if (this.activeChar === null) { return false; }
         const pData = this.rollData.data[this.activeChar];
         this.titleElem.innerText = `${pData.name} - ${this.weekName}`;
+
         // Attacked Box
         this.charAttackedBox.innerHTML = '';    // clear the box before adding new elements
         // title
@@ -434,25 +448,13 @@ class CharPage {
         // weapon specifics
         const allWeaponAttacks = pData.playerData.attackRollsDict;
         for (let key in allWeaponAttacks) {
-            const attackType = this.extractTitle(key);
-            const allAttackResults = allWeaponAttacks[key];
-            const bestHit = Math.max(...allAttackResults);
-            const worstHit = Math.min(...allAttackResults);
-            const avgHit = Math.round(allAttackResults.reduce((a, b) => a + b, 0) / allAttackResults.length);
             // new attack title
+            const allAttackResults = allWeaponAttacks[key];
             const newAtkTitle = document.createElement("h4");
-            newAtkTitle.innerText = `${allAttackResults.length}x ${attackType}`;
+            newAtkTitle.innerText = `${allAttackResults.length}x ${this.extractTitle(key)}`;
             this.charAttackedBox.appendChild(newAtkTitle);
-            // all rolls
-            const allRolls = document.createElement("p");
-            allRolls.className = "allRolls";
-            allRolls.innerText = `(${allAttackResults})`;
-            this.charAttackedBox.appendChild(allRolls);
-            // new attack quick stats
-            const atkStats = document.createElement("p");
-            atkStats.className = "quickStats";
-            atkStats.innerText = `Best Hit: ${bestHit} | Worst Hit: ${worstHit} | Average Hit: ${avgHit}`;
-            this.charAttackedBox.appendChild(atkStats);
+            // contents
+            this.addBoxContents(allAttackResults, this.charAttackedBox);
         }
 
         // Damage Box   - mostly the same as Attacked Box
@@ -464,28 +466,78 @@ class CharPage {
         // damage specifics
         const allDamageDone = pData.playerData.dmgRollsDict;
         for (let key in allDamageDone) {
-            const dmgType = this.extractTitle(key);
-            const allDmgResults = allDamageDone[key];
-            const bestDmg = Math.max(...allDmgResults);
-            const worstDmg = Math.min(...allDmgResults)
-            const allDmg = allDmgResults.reduce((a, b) => a + b, 0);
-            const avgDmg = Math.round(allDmgResults.reduce((a, b) => a + b, 0) / allDmgResults.length);
             // new dmg title
+            const allDmgResults = allDamageDone[key];
+            const allDmg = allDmgResults.reduce((a, b) => a + b, 0);
             const newDmgTitle = document.createElement("h4");
-            newDmgTitle.innerText = `${allDmg} from ${dmgType}`;
+            newDmgTitle.innerText = `${allDmg} from ${this.extractTitle(key)}`;
             this.charDamageBox.appendChild(newDmgTitle);
-            // all rolls
-            const allDmgRolls = document.createElement("p");
-            allDmgRolls.className = "allRolls";
-            allDmgRolls.innerText = `(${allDmgResults})`;
-            this.charDamageBox.appendChild(allDmgRolls);
-            // new dmg quick stats
-            const dmgStats = document.createElement("p");
-            dmgStats.className = "quickStats";
-            dmgStats.innerText = `Best Damage: ${bestDmg} | Worst Damage: ${worstDmg} | Average Damage: ${avgDmg}`;
-            this.charDamageBox.appendChild(dmgStats);
+            // contents
+            this.addBoxContents(allDmgResults, this.charDamageBox);
         }
 
+        // Ability Box
+        this.charAbilityBox.innerHTML = '';
+        // title
+        const abilityTitle = document.createElement("h3");
+        abilityTitle.innerText = `${this.activeChar} Performed ${pData.playerData.abilityRolls} Ability Checks`;
+        this.charAbilityBox.appendChild(abilityTitle);
+        // ability specifics
+        const allAbilityRolls = pData.playerData.abilityRollsDict;
+        for (let key in allAbilityRolls) {
+            // title
+            const allAbilityResults = allAbilityRolls[key];
+            const newAbilityTitle = document.createElement("h4");
+            newAbilityTitle.innerText = `${allAbilityResults.length}x ${this.extractTitle(key)} Checks`;
+            this.charAbilityBox.appendChild(newAbilityTitle);
+            // contents
+            this.addBoxContents(allAbilityResults, this.charAbilityBox);
+        }
+
+        // Save Box
+        this.charSaveBox.innerHTML = '';
+        // title
+        const saveTitle = document.createElement("h3");
+        saveTitle.innerText = `${this.activeChar} Attempted ${pData.playerData.saveRolls} Saves`;
+        this.charSaveBox.appendChild(saveTitle);
+        // save specifics
+        const allSaveRolls = pData.playerData.saveRollsDict;
+        for (let key in allSaveRolls) {
+            // title
+            const allSaveResults = allSaveRolls[key];
+            const newSaveTitle = document.createElement("h4");
+            newSaveTitle.innerText = `${allSaveResults.length}x ${this.extractTitle(key)} Saves`;
+            this.charSaveBox.appendChild(newSaveTitle);
+            // contents
+            this.addBoxContents(allSaveResults, this.charSaveBox);
+        }
+    }
+
+    // does not add a Title because they are different for each entry - does allRolls and quick stats
+    addBoxContents(arr, boxHTMLElem) {
+        const stats = this.getQuickStats(arr);
+        // all rolls
+        const allRolls = document.createElement("p");
+        allRolls.className = "allRolls";
+        allRolls.innerText = `(${arr})`;
+        // quick stats
+        const statsText = document.createElement("p");
+        statsText.className = "quickStats";
+        statsText.innerText = `Best: ${stats['highest']} | Worst: ${stats['lowest']} | Average: ${stats['avg']}`;
+        boxHTMLElem.append(allRolls, statsText);
+    }
+
+    // return a dict with highest, lowest and avg nums from an array
+    getQuickStats(arr) {
+        const highestNum = Math.max(...arr);
+        const lowestNum = Math.min(...arr);
+        const avgNum = Math.round(arr.reduce((a, b) => a + b, 0) / arr.length);
+        const d = {
+            'highest': highestNum,
+            'lowest': lowestNum,
+            'avg': avgNum
+        }
+        return d;
     }
 
     // extract the title of an attack/damage roll

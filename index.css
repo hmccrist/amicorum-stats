@@ -127,12 +127,13 @@ h4 {
 }
 
 .charPageBox {
-    background-color: rgba(0, 0, 0, 0.2);
+    background-color: rgba(0, 0, 0, 0.5);
     padding-left: 10px;
-    padding-top: 1px;
     width: 500px;
+    height: 740px;
     outline: none;
     box-shadow: 0 0 10px #00293b;
+    overflow-y: auto;
 }
 
 .allRolls {
@@ -140,10 +141,12 @@ h4 {
     font-style: italic;
     line-height: 0%;
     color: rgb(15, 15, 15);
+    color: rgb(191, 204, 203);
 }
 
 .quickStats {
     font-size: large;
+    color: rgb(210, 239, 240);
 }
 
 
