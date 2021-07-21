@@ -111,7 +111,7 @@ h4 {
     text-align: center;
 }
 
-#disclaimer {
+.footerText {
     color: rgba(255, 255, 255, 0.8);
     font-size: small;
     font-style: italic;
