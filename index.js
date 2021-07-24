@@ -167,6 +167,7 @@ class RollData {
             'Explosion': new PlayerData(explosionFullName, explosionColour),
             'Dracone': new PlayerData(draconeFullName, draconeColour),
             'Ruusk': new PlayerData(ruuskFullName, ruuskColour),
+            'Glace': new PlayerData(glaceFullName, glaceColour),
             'NPCs': new PlayerData('NPCs', npcColour)
         }
         this.buildData(rawData);
@@ -191,7 +192,8 @@ class RollData {
             [alwinFullName]: 'Alwin',
             [explosionFullName]: 'Explosion',
             [draconeFullName]: 'Dracone',
-            [ruuskFullName]: 'Ruusk'
+            [ruuskFullName]: 'Ruusk',
+            [glaceFullName]: 'Glace'
         }
         let name = nameConversion[roll['sender']];
         let rollType = '';
@@ -328,6 +330,7 @@ allRollData.combineRollData(week4RollData);
 allRollData.combineRollData(week5RollData);
 allRollData.combineRollData(week6RollData);
 allRollData.combineRollData(week7RollData);
+allRollData.combineRollData(week8RollData);
 
 const pageData = {
     all: {
@@ -580,7 +583,7 @@ class CharPage {
     }
 
     setActiveChar(charName) {
-        const validCharNames = ['Alwin', 'Casmenos', 'Dracone', 'Explosion', 'NPCs', 'Ruusk'];
+        const validCharNames = ['Alwin', 'Casmenos', 'Dracone', 'Explosion', 'NPCs', 'Glace', 'Ruusk'];
         if (!validCharNames.includes(charName)) { console.error(`Invalid charName: '${charName}' @ setActiveChar`); return false;}
         this.activeChar = charName;
         this.updatePage();
@@ -641,6 +644,7 @@ const alwinButton = new charButton(document.getElementById("alwinButton"), 'Alwi
 const explosionButton = new charButton(document.getElementById("explosionButton"), "Explosion");
 const draconeButton = new charButton(document.getElementById("draconeButton"), 'Dracone');
 const ruuskButton = new charButton(document.getElementById("ruuskButton"), 'Ruusk');
+const glaceButton = new charButton(document.getElementById("glaceButton"), "Glace");
 
 // global func to make all buttons inactive
 function makeAllCharButtonsInactive() {
@@ -649,4 +653,5 @@ function makeAllCharButtonsInactive() {
     explosionButton.setActive(false);
     draconeButton.setActive(false);
     ruuskButton.setActive(false);
+    glaceButton.setActive(false);
 }
