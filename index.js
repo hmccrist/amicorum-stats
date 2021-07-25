@@ -90,7 +90,7 @@ class RollGraph {
 class PlayerData {
     constructor(name, colour) {
         this.name = name;
-        this.playerData = {                 // if adding any new values, remeber to update combineData() also
+        this.playerData = {                 // if adding any new values, remember to update combineData() also
             'colour': colour,
             'totalRolls': 0,
             'nat20s': 0,
@@ -105,8 +105,41 @@ class PlayerData {
             'attackRollsDict': {},          // key = title | value(s) = rollShort
             'dmgRollsDict': {},
             'abilityRollsDict': {},
-            'saveRollsDict': {}
+            'saveRollsDict': {},
+            'attackRollsSorted': [],        // 2D arrays where index 0 for each inner array is the name followed by all the rolls.
+            'dmgRollsSorted': [],
+            'abilityRollsSorted': [],
+            'saveRollsSorted': []
         };
+    }
+
+    // sorts the dictonarys into the 2d sorted arrays
+    sortDicts() {
+        const dictsToSort = {
+            'abilityRollsDict': 'abilityRollsSorted',
+            'saveRollsDict': 'saveRollsSorted',
+            'attackRollsDict': 'attackRollsSorted',
+            'dmgRollsDict': 'dmgRollsSorted'
+        }
+        for (let dict in dictsToSort) {
+            let sortedArray = dictsToSort[dict];
+            // convert each key->value pair in the dict to an array where element 0 is the key
+            const currentSortArray = [];
+            for (let key in this.playerData[dict]) {
+                let newArr = [];
+                newArr.push(key);
+                newArr = newArr.concat(this.playerData[dict][key]);
+                currentSortArray.push(newArr);
+            }
+            // damage rolls get their own special sort (sort by sum instead of length)
+            if (dict === 'dmgRollsDict') {
+                // each reduce arrow func just skips the first element in the array (the name) and then sums the rest of the numbers
+                currentSortArray.sort((a, b) => b.slice(1).reduce((n1,n2) => n1 + n2, 0) - a.slice(1).reduce((n1, n2) => n1 + n2, 0));
+            } else {
+                currentSortArray.sort((a, b) => b.length - a.length);
+            }
+            this.playerData[sortedArray] = currentSortArray;
+        }
     }
 
     calculateAvg() {
@@ -156,6 +189,7 @@ class PlayerData {
         this.combineDicts('abilityRollsDict', newPlayerData['abilityRollsDict']);
         this.combineDicts('saveRollsDict', newPlayerData['saveRollsDict']);
         this.calculateAvg();
+        this.sortDicts();
     }
 }
 
@@ -179,9 +213,10 @@ class RollData {
             const roll = rawData[i];
             this.updateData(roll);
         }
-        // calculate averages for chars after all data is collected
+        // calculate averages for chars after all data is collected AND sort the dicts (not a big fan of this code)
         for (let char in this.data) {
             this.data[char].calculateAvg();
+            this.data[char].sortDicts();
         }
     }
 
@@ -480,12 +515,12 @@ class CharPage {
         attackedTitle.innerText = `${this.activeChar} Attacked ${pData.playerData.attackRolls} Times`;
         this.charAttackedBox.appendChild(attackedTitle);
         // weapon specifics
-        const allWeaponAttacks = pData.playerData.attackRollsDict;
-        for (let key in allWeaponAttacks) {
+        const allWeaponAttacks = pData.playerData.attackRollsSorted;
+        for (let i in allWeaponAttacks) {
             // new attack title
-            const allAttackResults = allWeaponAttacks[key];
+            const allAttackResults = allWeaponAttacks[i].slice(1);  // skip first element which is the name
             const newAtkTitle = document.createElement("h4");
-            newAtkTitle.innerText = `${allAttackResults.length}x ${this.extractTitle(key)}`;
+            newAtkTitle.innerText = `${allAttackResults.length}x ${this.extractTitle(allWeaponAttacks[i][0])}`;
             this.charAttackedBox.appendChild(newAtkTitle);
             // contents
             this.addBoxContents(allAttackResults, this.charAttackedBox);
@@ -497,17 +532,17 @@ class CharPage {
         const damageTitle = document.createElement("h3");
         damageTitle.innerText = `${this.activeChar} Dealt ${pData.playerData.dmgDoneTotal} Damage`;
         this.charDamageBox.appendChild(damageTitle);
-        // damage specifics
-        const allDamageDone = pData.playerData.dmgRollsDict;
-        for (let key in allDamageDone) {
+        // All damage specifics
+        const allDamageDone = pData.playerData.dmgRollsSorted;
+        for (let i in allDamageDone) {
             // new dmg title
-            const allDmgResults = allDamageDone[key];
-            const allDmg = allDmgResults.reduce((a, b) => a + b, 0);
+            const allDmgRolls = allDamageDone[i].slice(1);     
+            const totalDmg = allDmgRolls.reduce((a, b) => a + b, 0);
             const newDmgTitle = document.createElement("h4");
-            newDmgTitle.innerText = `${allDmg} from ${this.extractTitle(key)}`;
+            newDmgTitle.innerText = `${totalDmg} from ${this.extractTitle(allDamageDone[i][0])}`;
             this.charDamageBox.appendChild(newDmgTitle);
             // contents
-            this.addBoxContents(allDmgResults, this.charDamageBox);
+            this.addBoxContents(allDmgRolls, this.charDamageBox);
         }
 
         // Ability Box
@@ -517,12 +552,12 @@ class CharPage {
         abilityTitle.innerText = `${this.activeChar} Performed ${pData.playerData.abilityRolls} Ability Checks`;
         this.charAbilityBox.appendChild(abilityTitle);
         // ability specifics
-        const allAbilityRolls = pData.playerData.abilityRollsDict;
-        for (let key in allAbilityRolls) {
+        const allAbilityRolls = pData.playerData.abilityRollsSorted;
+        for (let i in allAbilityRolls) {
             // title
-            const allAbilityResults = allAbilityRolls[key];
+            const allAbilityResults = allAbilityRolls[i].slice(1);
             const newAbilityTitle = document.createElement("h4");
-            newAbilityTitle.innerText = `${allAbilityResults.length}x ${this.extractTitle(key)} Checks`;
+            newAbilityTitle.innerText = `${allAbilityResults.length}x ${this.extractTitle(allAbilityRolls[i][0])} Checks`;
             this.charAbilityBox.appendChild(newAbilityTitle);
             // contents
             this.addBoxContents(allAbilityResults, this.charAbilityBox);
@@ -535,12 +570,12 @@ class CharPage {
         saveTitle.innerText = `${this.activeChar} Attempted ${pData.playerData.saveRolls} Saves`;
         this.charSaveBox.appendChild(saveTitle);
         // save specifics
-        const allSaveRolls = pData.playerData.saveRollsDict;
-        for (let key in allSaveRolls) {
+        const allSaveRolls = pData.playerData.saveRollsSorted;
+        for (let i in allSaveRolls) {
             // title
-            const allSaveResults = allSaveRolls[key];
+            const allSaveResults = allSaveRolls[i].slice(1);
             const newSaveTitle = document.createElement("h4");
-            newSaveTitle.innerText = `${allSaveResults.length}x ${this.extractTitle(key)} Saves`;
+            newSaveTitle.innerText = `${allSaveResults.length}x ${this.extractTitle(allSaveRolls[i][0])} Saves`;
             this.charSaveBox.appendChild(newSaveTitle);
             // contents
             this.addBoxContents(allSaveResults, this.charSaveBox);
