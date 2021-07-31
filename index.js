@@ -367,6 +367,7 @@ allRollData.combineRollData(week5RollData);
 allRollData.combineRollData(week6RollData);
 allRollData.combineRollData(week7RollData);
 allRollData.combineRollData(week8RollData);
+allRollData.combineRollData(week9RollData);
 
 const pageData = {
     all: {
