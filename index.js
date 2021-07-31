@@ -356,6 +356,7 @@ const week5RollData = new RollData(week5Data);
 const week6RollData = new RollData(week6Data);
 const week7RollData = new RollData(week7Data);
 const week8RollData = new RollData(week8Data);
+const week9RollData = new RollData(week9Data);
 
 // easiest way to do this (probably not the best...)
 const allRollData = new RollData(week1Data);
@@ -421,6 +422,12 @@ const pageData = {
         charPageTitle: 'Week 8',
         button: document.getElementById("week8Button"),
         data: week8RollData
+    },
+    week9: {
+        title: 'Week 9 - Are we the Baddies?',
+        charPageTitle: 'Week 9',
+        button: document.getElementById('week9Button'),
+        data: week9RollData
     }
 }
 
