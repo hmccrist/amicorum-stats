@@ -358,6 +358,8 @@ const week7RollData = new RollData(week7Data);
 const week8RollData = new RollData(week8Data);
 const week9RollData = new RollData(week9Data);
 const week10RollData = new RollData(week10Data);
+const week11RollData = new RollData(week11Data);
+const week12RollData = new RollData(week12Data)
 
 // easiest way to do this (probably not the best...)
 const allRollData = new RollData(week1Data);
@@ -370,6 +372,8 @@ allRollData.combineRollData(week7RollData);
 allRollData.combineRollData(week8RollData);
 allRollData.combineRollData(week9RollData);
 allRollData.combineRollData(week10RollData);
+allRollData.combineRollData(week11RollData);
+allRollData.combineRollData(week12RollData);
 
 const pageData = {
     all: {
@@ -437,6 +441,18 @@ const pageData = {
         charPageTitle: 'Week 10',
         button: document.getElementById('week10Button'),
         data: week10RollData
+    },
+    week11: {
+        title: 'Week 11 - The Great Warrior Rat, Jeremy',
+        charPageTitle: 'Week 11',
+        button: document.getElementById("week11Button"),
+        data: week11RollData
+    },
+    week12: {
+        title: 'Week 12 - Diversity',
+        charPageTitle: 'Week 12',
+        button: document.getElementById("week12Button"),
+        data: week12RollData
     }
 }
 
