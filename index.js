@@ -362,6 +362,9 @@ const week11RollData = new RollData(week11Data);
 const week12RollData = new RollData(week12Data);
 const week13RollData = new RollData(week13Data);
 const week14RollData = new RollData(week14Data);
+const week15RollData = new RollData(week15Data);
+const week16RollData = new RollData(week16Data);
+const week17RollData = new RollData(week17Data);
 
 // easiest way to do this (probably not the best...)
 const allRollData = new RollData(week1Data);
@@ -378,6 +381,9 @@ allRollData.combineRollData(week11RollData);
 allRollData.combineRollData(week12RollData);
 allRollData.combineRollData(week13RollData);
 allRollData.combineRollData(week14RollData);
+allRollData.combineRollData(week15RollData);
+allRollData.combineRollData(week16RollData);
+allRollData.combineRollData(week17RollData);
 
 const pageData = {
     all: {
@@ -464,11 +470,29 @@ const pageData = {
         button: document.getElementById("week13Button"),
         data: week13RollData
     },
-    week14 : {
+    week14: {
         title: 'Week 14 - Nice guys finish last.',
-        charPageTitle: "Week 14",
+        charPageTitle: 'Week 14',
         button: document.getElementById("week14Button"),
         data: week14RollData
+    },
+    week15: {
+        title: 'Week 15 - Finding some free treasure laying around.',
+        charPageTitle: 'Week 15',
+        button: document.getElementById("week15Button"),
+        data: week15RollData
+    },
+    week16: {
+        title: 'Week 16 - Being chased by a dragon for unknown reasons.',
+        charPageTitle: 'Week 16',
+        button: document.getElementById("week16Button"),
+        data: week16RollData
+    },
+    week17: {
+        title: 'Week 17 - Showdown with Xardorok Stunblight',
+        charPageTitle: 'Week 17',
+        button: document.getElementById("week17Button"),
+        data: week17RollData
     }
 }
 
