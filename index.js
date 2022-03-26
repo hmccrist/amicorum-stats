@@ -366,6 +366,18 @@ const week15RollData = new RollData(week15Data);
 const week16RollData = new RollData(week16Data);
 const week17RollData = new RollData(week17Data);
 const week18RollData = new RollData(week18Data);
+const week19RollData = new RollData(week19Data);
+const week20RollData = new RollData(week20Data);
+const week21RollData = new RollData(week21Data);
+const week22RollData = new RollData(week22Data);
+const week23RollData = new RollData(week23Data);
+const week24RollData = new RollData(week24Data);
+const week25RollData = new RollData(week25Data);
+const week26RollData = new RollData(week26Data);
+const week27RollData = new RollData(week27Data);
+const week28RollData = new RollData(week28Data);
+const week29RollData = new RollData(week29Data);
+const week30RollData = new RollData(week30Data);
 
 // easiest way to do this (probably not the best...)
 const allRollData = new RollData(week1Data);
@@ -386,6 +398,18 @@ allRollData.combineRollData(week15RollData);
 allRollData.combineRollData(week16RollData);
 allRollData.combineRollData(week17RollData);
 allRollData.combineRollData(week18RollData)
+allRollData.combineRollData(week19RollData)
+allRollData.combineRollData(week20RollData)
+allRollData.combineRollData(week21RollData)
+allRollData.combineRollData(week22RollData)
+allRollData.combineRollData(week23RollData)
+allRollData.combineRollData(week24RollData)
+allRollData.combineRollData(week25RollData)
+allRollData.combineRollData(week26RollData)
+allRollData.combineRollData(week27RollData)
+allRollData.combineRollData(week28RollData)
+allRollData.combineRollData(week29RollData)
+allRollData.combineRollData(week30RollData)
 
 const pageData = {
     all: {
@@ -473,7 +497,7 @@ const pageData = {
         data: week13RollData
     },
     week14: {
-        title: 'Week 14 - Nice guys finish last',
+        title: 'Week 14 - Never trust women (if they\'re harpys)',
         charPageTitle: 'Week 14',
         button: document.getElementById("week14Button"),
         data: week14RollData
@@ -501,6 +525,78 @@ const pageData = {
         charPageTitle: 'Week 18',
         button: document.getElementById("week18Button"),
         data: week18RollData
+    },
+    week19: {
+        title: 'Now we\'re killing a dragon.',
+        charPageTitle: 'Week 19',
+        button: document.getElementById("week19Button"),
+        data: week19RollData
+    },
+    week20: {
+        title: 'Week 20 - Mammoth Cannonball',
+        charPageTitle: 'Week 20',
+        button: document.getElementById("week20Button"),
+        data: week20RollData
+    },
+    week21: {
+        title: 'Week 21 - Battle on the Open Sea',
+        charPageTitle: 'Week 21',
+        button: document.getElementById("week21Button"),
+        data: week21RollData
+    },
+    week22: {
+        title: 'Week 22 - Return of Snowy the Chwinga',
+        charPageTitle: 'Week 22',
+        button: document.getElementById("week22Button"),
+        data: week22RollData
+    },
+    week23: {
+        title: 'Week 23 - The Trial of Preservation',
+        charPageTitle: 'Week 23',
+        button: document.getElementById("week23Button"),
+        data: week23RollData
+    },
+    week24: {
+        title: 'Week 24 - Murdering a god real quick.',
+        charPageTitle: 'Week 24',
+        button: document.getElementById("week24Button"),
+        data: week24RollData
+    },
+    week25: {
+        title: 'Week 25 - Travelling across the continent real quick',
+        charPageTitle: 'Week 25',
+        button: document.getElementById("week25Button"),
+        data: week25RollData
+    },
+    week26: {
+        title: 'Week 26 - 11 Shadows vs 1 Fireball: Who Wins?',
+        charPageTitle: 'Week 26',
+        button: document.getElementById("week26Button"),
+        data: week26RollData
+    },
+    week27: {
+        title: 'Week 27 - Mistrust and Madness',
+        charPageTitle: 'Week 27',
+        button: document.getElementById("week27Button"),
+        data: week27RollData
+    },
+    week28: {
+        title: 'Week 28 - Final Showdown in the Caves',
+        charPageTitle: 'Week 28',
+        button: document.getElementById("week28Button"),
+        data: week28RollData
+    },
+    week29: {
+        title: 'Week 29 - The Horny Anvil',
+        charPageTitle: 'Week 29',
+        button: document.getElementById("week29Button"),
+        data: week29RollData
+    },
+    week30: {
+        title: 'Week 30 - Friendly Demons and Angry Plants',
+        charPageTitle: 'Week 30',
+        button: document.getElementById("week30Button"),
+        data: week30RollData
     }
 }
 
